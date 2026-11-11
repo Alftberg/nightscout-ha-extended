@@ -1,6 +1,6 @@
 # Nightscout Extended
 
-Nightscout Extended v0.1.7 läser glukos och Loop-telemetri från Nightscout API v1 till Home Assistant. Integrationen hämtar data varje minut och kräver Home Assistant 2026.1.0 eller senare.
+Nightscout Extended v0.1.8 läser glukos och Loop-telemetri från Nightscout API v1 till Home Assistant. Integrationen hämtar data varje minut och kräver Home Assistant 2026.1.0 eller senare.
 
 | Entitet | Källa |
 | --- | --- |

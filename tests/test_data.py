@@ -209,3 +209,14 @@ class ParserTest(unittest.TestCase):
         }
         data = parser["saved_profile"]([profile], NOW)
         self.assertEqual(data, {"saved_profile": "Synthetic", "scheduled_basal": 0.8})
+
+
+    def test_saved_profile_accepts_uppercase_etc_timezone(self):
+        profile = {
+            "defaultProfile": "Synthetic",
+            "store": {"Synthetic": {"timezone": "ETC/GMT-1", "basal": [
+                {"timeAsSeconds": 0, "value": 0.5},
+                {"timeAsSeconds": 13 * 3600, "value": 0.8},
+            ]}},
+        }
+        self.assertEqual(parser["saved_profile"]([profile], NOW)["scheduled_basal"], 0.8)

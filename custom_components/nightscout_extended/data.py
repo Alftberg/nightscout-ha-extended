@@ -291,6 +291,8 @@ def saved_profile(records, now):
         schedule = profile.get("basal")
         if not isinstance(timezone_name, str) or not isinstance(schedule, list):
             return data
+        if timezone_name.startswith("ETC/"):
+            timezone_name = "Etc/" + timezone_name[4:]
         try:
             local_time = now.astimezone(ZoneInfo(timezone_name))
         except (ValueError, ZoneInfoNotFoundError):
