@@ -7,6 +7,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.const import CONF_UNIT_OF_MEASUREMENT, PERCENTAGE, UnitOfMass, UnitOfTime
+from homeassistant.util.unit_conversion import BloodGlucoseConcentrationConverter
 
 from .const import AGE_EVENTS, GLUCOSE_SENSOR_KEYS, TREND_STATES
 from .entity import NightscoutEntity
@@ -18,6 +19,20 @@ DESCRIPTIONS = (
         device_class=SensorDeviceClass.BLOOD_GLUCOSE_CONCENTRATION,
         native_unit_of_measurement="mg/dL",
         state_class=SensorStateClass.MEASUREMENT,
+    ),
+    SensorEntityDescription(key="glucose_rate", translation_key="glucose_rate", suggested_display_precision=2),
+    SensorEntityDescription(
+        key="temporary_basal", translation_key="temporary_basal", native_unit_of_measurement="U/h",
+    ),
+    SensorEntityDescription(
+        key="last_carbs", translation_key="last_carbs", native_unit_of_measurement=UnitOfMass.GRAMS,
+    ),
+    SensorEntityDescription(
+        key="last_correction_bolus", translation_key="last_correction_bolus", native_unit_of_measurement="U",
+    ),
+    SensorEntityDescription(key="saved_profile", translation_key="saved_profile"),
+    SensorEntityDescription(
+        key="scheduled_basal", translation_key="scheduled_basal", native_unit_of_measurement="U/h",
     ),
     SensorEntityDescription(key="trend", translation_key="trend"),
     SensorEntityDescription(
@@ -104,19 +119,36 @@ async def async_setup_entry(hass, entry, async_add_entities):
 class NightscoutSensor(NightscoutEntity, SensorEntity):
     def __init__(self, entry, description):
         super().__init__(entry, description)
+        self.entry = entry
         if description.key in GLUCOSE_SENSOR_KEYS:
             self._attr_suggested_unit_of_measurement = entry.options.get(
                 CONF_UNIT_OF_MEASUREMENT
             )
 
     @property
+    def native_unit_of_measurement(self):
+        if self.entity_description.key == "glucose_rate":
+            return f"{self.glucose_unit}/min"
+        return super().native_unit_of_measurement
+
+    @property
+    def glucose_unit(self):
+        return self.entry.options.get(CONF_UNIT_OF_MEASUREMENT, "mg/dL")
+
+    @property
     def native_value(self):
+        if self.entity_description.key == "glucose_rate" and self.value is not None:
+            return BloodGlucoseConcentrationConverter.convert(
+                self.value, "mg/dL", self.glucose_unit
+            )
         if self.entity_description.key == "trend_text":
             return TREND_STATES.get(self.coordinator.data.get("trend"))
         return self.value
 
     @property
     def extra_state_attributes(self):
+        if self.entity_description.key in ("temporary_basal", "last_carbs", "last_correction_bolus"):
+            return self.coordinator.data.get(f"{self.entity_description.key}_details")
         if self.entity_description.key == "override_profile" and self.available:
             return self.coordinator.data.get("override_attributes")
         if self.entity_description.key == "glucose_forecast" and self.value is not None:

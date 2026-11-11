@@ -1,6 +1,6 @@
 # Nightscout Extended
 
-Nightscout Extended v0.1.6 läser glukos och Loop-telemetri från Nightscout API v1 till Home Assistant. Integrationen hämtar data varje minut och kräver Home Assistant 2026.1.0 eller senare.
+Nightscout Extended v0.1.7 läser glukos och Loop-telemetri från Nightscout API v1 till Home Assistant. Integrationen hämtar data varje minut och kräver Home Assistant 2026.1.0 eller senare.
 
 | Entitet | Källa |
 | --- | --- |
@@ -46,3 +46,12 @@ Diagnostikfilen innehåller enbart status för senaste hämtningen. Konfigurera 
 python3 -m compileall -q custom_components
 python3 -m unittest discover -s tests -v
 ```
+
+
+## Behandlings- och profilentiteter
+
+- **Beräknad trendhastighet** delar glukosförändringen med tiden mellan mätningarna. Den använder integrationens valda enhet per minut, med mg/dL/min som standard.
+- **Loggad temporär basal** visar hastigheten från den senaste pågående `Temp Basal`-posten. Entiteten blir okänd när perioden löpt ut.
+- **Senaste kolhydratkorrigering** och **Senaste korrektionsbolus** visar senast loggade mängd för respektive händelsetyp. Tidpunkt och tillgänglig metadata visas som attribut.
+- **Sparad standardprofil** och **Schemalagd basal** hämtas från `profile`. Basalvärdet gäller schemat för profilens tidszon.
+- **Aktiv temporär profil** prioriterar namnet från Loop och använder den loggade override-händelsen när Loop-rapporten saknar namn.

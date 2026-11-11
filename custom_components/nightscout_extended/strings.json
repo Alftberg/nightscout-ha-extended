@@ -98,6 +98,24 @@
       },
       "override_profile": {
         "name": "Active temporary profile"
+      },
+      "glucose_rate": {
+        "name": "Calculated glucose rate"
+      },
+      "temporary_basal": {
+        "name": "Logged temporary basal"
+      },
+      "last_carbs": {
+        "name": "Latest carb correction"
+      },
+      "last_correction_bolus": {
+        "name": "Latest correction bolus"
+      },
+      "saved_profile": {
+        "name": "Saved default profile"
+      },
+      "scheduled_basal": {
+        "name": "Scheduled basal"
       }
     },
     "binary_sensor": {

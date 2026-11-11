@@ -98,6 +98,24 @@
       },
       "override_profile": {
         "name": "Aktiv temporär profil"
+      },
+      "glucose_rate": {
+        "name": "Beräknad trendhastighet"
+      },
+      "temporary_basal": {
+        "name": "Loggad temporär basal"
+      },
+      "last_carbs": {
+        "name": "Senaste kolhydratkorrigering"
+      },
+      "last_correction_bolus": {
+        "name": "Senaste korrektionsbolus"
+      },
+      "saved_profile": {
+        "name": "Sparad standardprofil"
+      },
+      "scheduled_basal": {
+        "name": "Schemalagd basal"
       }
     },
     "binary_sensor": {

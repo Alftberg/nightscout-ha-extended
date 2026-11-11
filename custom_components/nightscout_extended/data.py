@@ -1,6 +1,7 @@
 """Interpret Nightscout records without Home Assistant dependencies."""
 
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from math import isfinite
 
 MAX_AGE = timedelta(minutes=15)
@@ -59,7 +60,9 @@ def parse(entries, statuses, now):
                     and previous_glucose is not None
                     and previous_glucose >= 39
                 ):
-                    data["glucose_delta"] = glucose - previous_glucose
+                    delta = glucose - previous_glucose
+                    data["glucose_delta"] = delta
+                    data["glucose_rate"] = delta / ((measured - previous_time).total_seconds() / 60)
                 break
             if isinstance(entry.get("direction"), str):
                 data["trend"] = entry["direction"]
@@ -87,6 +90,12 @@ def parse(entries, statuses, now):
                     data["override_active"] = active
                     if active:
                         attributes = {}
+                        name = section.get("name")
+                        if isinstance(name, str) and name.strip():
+                            data["override_profile"] = name.strip()[:255]
+                        duration = number(section.get("duration"))
+                        if duration is not None and duration >= 0:
+                            attributes["reported_duration_seconds"] = duration
                         multiplier = number(section.get("multiplier"))
                         if multiplier is not None and 0 <= multiplier <= 100:
                             attributes["insulin_scale_percent"] = multiplier * 100
@@ -213,3 +222,89 @@ def active_override_profile(records, now):
         if isinstance(name, str) and name.strip():
             return name.strip()[:255], attributes
     return None, attributes
+
+def treatment_snapshot(records, now):
+    """Summarize the newest logged event of each supported treatment type."""
+    latest = {}
+    for record in records:
+        kind = record.get("eventType")
+        if kind not in ("Temp Basal", "Carb Correction", "Correction Bolus"):
+            continue
+        started = timestamp(record.get("created_at")) or timestamp(record.get("timestamp"))
+        if started is not None and started <= now and (
+            kind not in latest or started > latest[kind][0]
+        ):
+            latest[kind] = (started, record)
+
+    data = {}
+    for kind, (started, record) in latest.items():
+        if kind == "Temp Basal":
+            duration = number(record.get("duration"))
+            rate = number(record.get("absolute"))
+            if rate is None and record.get("temp") in (None, "absolute"):
+                rate = number(record.get("rate"))
+            if duration is None or duration <= 0 or rate is None or rate < 0:
+                continue
+            if (now - started).total_seconds() / 60 >= duration:
+                continue
+            try:
+                ends = started + timedelta(minutes=duration)
+            except OverflowError:
+                continue
+            data["temporary_basal"] = rate
+            data["temporary_basal_details"] = {
+                "ends_at": ends.isoformat(),
+                "started_at": started.isoformat(),
+                "duration_minutes": duration,
+            }
+        else:
+            key, field = (
+                ("last_carbs", "carbs") if kind == "Carb Correction" else
+                ("last_correction_bolus", "insulin")
+            )
+            amount = number(record.get(field))
+            if amount is None or amount <= 0:
+                continue
+            data[key] = amount
+            details = {"recorded_at": started.isoformat()}
+            if field == "carbs":
+                absorption = number(record.get("absorptionTime"))
+                if absorption is not None and absorption > 0:
+                    details["absorption_minutes"] = absorption
+            elif isinstance(record.get("automatic"), bool):
+                details["automatic"] = record["automatic"]
+            data[f"{key}_details"] = details
+    return data
+
+
+def saved_profile(records, now):
+    """Read the saved default profile and its scheduled basal rate."""
+    for record in records:
+        name = record.get("defaultProfile")
+        if not isinstance(name, str) or not name.strip():
+            continue
+        profile = mapping(mapping(record.get("store")).get(name))
+        if not profile:
+            continue
+        data = {"saved_profile": name.strip()[:255]}
+        timezone_name = profile.get("timezone")
+        schedule = profile.get("basal")
+        if not isinstance(timezone_name, str) or not isinstance(schedule, list):
+            return data
+        try:
+            local_time = now.astimezone(ZoneInfo(timezone_name))
+        except (ValueError, ZoneInfoNotFoundError):
+            return data
+        second = local_time.hour * 3600 + local_time.minute * 60 + local_time.second
+        segments = {}
+        for item in schedule:
+            segment = mapping(item)
+            starts = number(segment.get("timeAsSeconds"))
+            value = number(segment.get("value"))
+            if starts is not None and 0 <= starts < 86400 and value is not None and value >= 0:
+                segments[starts] = value
+        if segments:
+            active = max((start for start in segments if start <= second), default=max(segments))
+            data["scheduled_basal"] = segments[active]
+        return data
+    return {}

@@ -9,7 +9,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 
 from .api import NightscoutAuthError, NightscoutError
 from .const import AGE_EVENTS, DOMAIN, OVERRIDE_EVENTS
-from .data import active_override_profile, event_age_hours, parse
+from .data import active_override_profile, event_age_hours, parse, saved_profile, treatment_snapshot
 
 
 class NightscoutCoordinator(DataUpdateCoordinator):
@@ -36,18 +36,27 @@ class NightscoutCoordinator(DataUpdateCoordinator):
         fetch_override = data.get("override_active") is True
         if fetch_override:
             event_groups.append(OVERRIDE_EVENTS)
-        ages = await asyncio.gather(
-            *(self._async_fetch_events(types) for types in event_groups)
+        ages, treatments, profiles = await asyncio.gather(
+            asyncio.gather(*(self._async_fetch_events(types) for types in event_groups)),
+            asyncio.gather(*(
+                self._async_fetch_events((kind,))
+                for kind in ("Temp Basal", "Carb Correction", "Correction Bolus")
+            )),
+            self._async_fetch_profiles(),
         )
         now = datetime.now(timezone.utc)
         data = parse(entries, statuses, now)
         override_events = ages.pop() if fetch_override else []
         if data.get("override_active") is True:
             name, attributes = active_override_profile(override_events, now)
-            data["override_profile"] = name
-            data["override_attributes"].update(attributes)
+            if name is not None and "override_profile" not in data:
+                data["override_profile"] = name
+            if name is None or data.get("override_profile") == name:
+                data["override_attributes"].update(attributes)
         for (key, event_types), records in zip(AGE_EVENTS.items(), ages, strict=True):
             data[key] = event_age_hours(records, event_types, now)
+        data.update(treatment_snapshot([record for group in treatments for record in group], now))
+        data.update(saved_profile(profiles, now))
         return data
 
     async def _async_fetch_events(self, event_types):
@@ -55,4 +64,11 @@ class NightscoutCoordinator(DataUpdateCoordinator):
             return await self.client.fetch_treatment_events(event_types)
         except NightscoutError as error:
             self.logger.debug("Could not read Nightscout treatment events: %s", error)
+            return []
+
+    async def _async_fetch_profiles(self):
+        try:
+            return await self.client.fetch_profiles()
+        except NightscoutError as error:
+            self.logger.debug("Could not read Nightscout profiles: %s", error)
             return []

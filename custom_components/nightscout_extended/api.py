@@ -65,3 +65,6 @@ class NightscoutClient:
             )
         )
         return [record for records in results for record in records]
+
+    async def fetch_profiles(self):
+        return await self._get("profile", 5)

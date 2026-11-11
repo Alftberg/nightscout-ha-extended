@@ -184,3 +184,28 @@ class ParserTest(unittest.TestCase):
             "target_min_mg_dl": 100,
             "target_max_mg_dl": 110,
         })
+
+    def test_treatment_snapshot(self):
+        snapshot = parser["treatment_snapshot"]
+        basal = {"eventType": "Temp Basal", "created_at": RECENT,
+                 "duration": 5, "absolute": 0}
+        carb = {"eventType": "Carb Correction", "created_at": STALE,
+                "carbs": 10, "absorptionTime": 60}
+        bolus = {"eventType": "Correction Bolus", "created_at": RECENT,
+                 "insulin": 1, "automatic": False}
+        data = snapshot([basal, carb, bolus], NOW)
+        self.assertEqual(data["temporary_basal"], 0)
+        self.assertEqual(data["last_carbs_details"]["absorption_minutes"], 60)
+        self.assertIs(data["last_correction_bolus_details"]["automatic"], False)
+        self.assertNotIn("temporary_basal", snapshot([basal], NOW + timedelta(minutes=4)))
+
+    def test_saved_profile_uses_local_schedule(self):
+        profile = {
+            "defaultProfile": "Synthetic",
+            "store": {"Synthetic": {"timezone": "Europe/Stockholm", "basal": [
+                {"timeAsSeconds": 0, "value": 0.5},
+                {"timeAsSeconds": 13 * 3600, "value": 0.8},
+            ]}},
+        }
+        data = parser["saved_profile"]([profile], NOW)
+        self.assertEqual(data, {"saved_profile": "Synthetic", "scheduled_basal": 0.8})

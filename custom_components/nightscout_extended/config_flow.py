@@ -3,7 +3,7 @@
 import voluptuous as vol
 from yarl import URL
 
-from homeassistant.config_entries import ConfigFlow, OptionsFlow
+from homeassistant.config_entries import ConfigFlow, OptionsFlowWithReload
 from homeassistant.const import CONF_TOKEN, CONF_UNIT_OF_MEASUREMENT, CONF_URL
 from homeassistant.core import callback
 from homeassistant.helpers import entity_registry as er
@@ -78,7 +78,7 @@ class NightscoutConfigFlow(ConfigFlow, domain=DOMAIN):
         )
         return self.async_show_form(step_id=step, data_schema=vol.Schema(fields), errors=errors)
 
-class NightscoutOptionsFlow(OptionsFlow):
+class NightscoutOptionsFlow(OptionsFlowWithReload):
     async def async_step_init(self, user_input=None):
         entry = self.config_entry
         registry = er.async_get(self.hass)
