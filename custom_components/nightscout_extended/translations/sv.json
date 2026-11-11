@@ -1,0 +1,38 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Anslut till Nightscout",
+        "data": {"url": "Nightscouts basadress", "token": "Åtkomsttoken med läsbehörighet (valfri)"}
+      },
+      "reauth_confirm": {
+        "title": "Återanslut till Nightscout",
+        "data": {"token": "Åtkomsttoken med läsbehörighet (valfri)"}
+      }
+    },
+    "error": {
+      "invalid_url": "Ange en giltig Nightscout-adress utan inloggningsuppgifter, frågeparametrar eller fragment.",
+      "invalid_auth": "Nightscout nekade åtkomst. Kontrollera token och dess läsbehörighet.",
+      "cannot_connect": "Det gick inte att läsa Nightscouts API. Kontrollera adressen och att servern är tillgänglig."
+    },
+    "abort": {
+      "already_configured": "Den här Nightscout-servern är redan konfigurerad.",
+      "reauth_successful": "Åtkomsten till Nightscout har återställts."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "glucose": {"name": "Glukos"},
+      "trend": {"name": "Glukostrend"},
+      "glucose_timestamp": {"name": "Tid för glukosmätning"},
+      "iob": {"name": "Aktivt insulin"},
+      "cob": {"name": "Aktiva kolhydrater"},
+      "reservoir": {"name": "Pumpens insulinreserv"},
+      "pump_battery": {"name": "Pumpbatteri"},
+      "loop_timestamp": {"name": "Tid för Loop-rapport"}
+    },
+    "binary_sensor": {
+      "loop_ok": {"name": "Senaste Loop-cykeln lyckades"}
+    }
+  }
+}

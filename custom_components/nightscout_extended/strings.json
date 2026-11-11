@@ -1,0 +1,38 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Nightscout",
+        "data": {"url": "Nightscout base URL", "token": "Read-only access token (optional)"}
+      },
+      "reauth_confirm": {
+        "title": "Reconnect to Nightscout",
+        "data": {"token": "Read-only access token (optional)"}
+      }
+    },
+    "error": {
+      "invalid_url": "Enter a valid Nightscout base URL without credentials, query or fragment.",
+      "invalid_auth": "Nightscout refused access. Check the token and its read permissions.",
+      "cannot_connect": "Could not read the Nightscout API. Check the URL and server availability."
+    },
+    "abort": {
+      "already_configured": "This Nightscout server is already configured.",
+      "reauth_successful": "Nightscout access has been restored."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "glucose": {"name": "Glucose"},
+      "trend": {"name": "Glucose trend"},
+      "glucose_timestamp": {"name": "Glucose reading time"},
+      "iob": {"name": "Insulin on board"},
+      "cob": {"name": "Carbs on board"},
+      "reservoir": {"name": "Pump reservoir"},
+      "pump_battery": {"name": "Pump battery"},
+      "loop_timestamp": {"name": "Loop report time"}
+    },
+    "binary_sensor": {
+      "loop_ok": {"name": "Last Loop cycle successful"}
+    }
+  }
+}

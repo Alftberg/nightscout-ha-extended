@@ -218,3 +218,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local Nightscout configuration
+*.py[cod]
+.venv/
+.DS_Store
+.env.*
+secrets.yaml
