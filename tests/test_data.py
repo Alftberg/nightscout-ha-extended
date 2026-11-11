@@ -10,7 +10,9 @@ parser_path = (
     Path(__file__).resolve().parents[1]
     / "custom_components/nightscout_extended/data.py"
 )
-parse = runpy.run_path(str(parser_path))["parse"]
+parser = runpy.run_path(str(parser_path))
+parse = parser["parse"]
+event_age_hours = parser["event_age_hours"]
 
 NOW = datetime(2026, 1, 1, 12, tzinfo=timezone.utc)
 RECENT = (NOW - timedelta(minutes=2)).isoformat()
@@ -92,3 +94,14 @@ class ParserTest(unittest.TestCase):
         self.assertIs(data["pump_suspended"], True)
         self.assertIs(data["pump_bolusing"], False)
         self.assertNotIn("uploader_battery", data)
+
+    def test_age_uses_latest_matching_past_event(self):
+        records = [
+            {"eventType": "Sensor Change", "created_at": "2025-12-31T12:00:00Z"},
+            {"eventType": "Sensor Start", "created_at": "2026-01-01T09:00:00Z"},
+            {"eventType": "Sensor Start", "created_at": "2026-01-01T13:00:00Z"},
+            {"eventType": "Note", "created_at": RECENT},
+            {"eventType": "Site Change", "created_at": "invalid"},
+        ]
+        self.assertEqual(event_age_hours(records, ("Sensor Start", "Sensor Change"), NOW), 3)
+        self.assertIsNone(event_age_hours(records, ("Site Change",), NOW))

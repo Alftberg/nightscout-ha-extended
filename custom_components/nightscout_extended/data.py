@@ -102,3 +102,17 @@ def parse(entries, statuses, now):
         elif timestamp(section.get("timestamp")) is not None:
             data["loop_ok"] = True
     return data
+
+
+def event_age_hours(records, event_types, now):
+    """Return hours since the latest matching event at or before now."""
+    latest = None
+    for record in records:
+        if record.get("eventType") not in event_types:
+            continue
+        occurred = timestamp(record.get("created_at"))
+        if occurred is not None and occurred <= now and (latest is None or occurred > latest):
+            latest = occurred
+    if latest is None:
+        return None
+    return (now - latest).total_seconds() / 3600

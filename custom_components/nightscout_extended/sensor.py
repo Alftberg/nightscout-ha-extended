@@ -6,7 +6,7 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.const import PERCENTAGE, UnitOfMass
+from homeassistant.const import PERCENTAGE, UnitOfMass, UnitOfTime
 
 from .entity import NightscoutEntity
 
@@ -26,6 +26,7 @@ DESCRIPTIONS = (
     ),
     SensorEntityDescription(
         key="iob", translation_key="iob", native_unit_of_measurement="U",
+        suggested_display_precision=2,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
@@ -50,6 +51,20 @@ DESCRIPTIONS = (
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
+    ),
+    SensorEntityDescription(
+        key="cage",
+        translation_key="cage",
+        device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=UnitOfTime.HOURS,
+        suggested_display_precision=1,
+    ),
+    SensorEntityDescription(
+        key="sage",
+        translation_key="sage",
+        device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=UnitOfTime.HOURS,
+        suggested_display_precision=1,
     ),
     SensorEntityDescription(
         key="loop_timestamp",

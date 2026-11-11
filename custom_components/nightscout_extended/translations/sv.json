@@ -56,6 +56,12 @@
       },
       "uploader_battery": {
         "name": "Uppladdarens batteri"
+      },
+      "cage": {
+        "name": "Infusionsställets ålder (CAGE)"
+      },
+      "sage": {
+        "name": "Glukossensorns ålder (SAGE)"
       }
     },
     "binary_sensor": {

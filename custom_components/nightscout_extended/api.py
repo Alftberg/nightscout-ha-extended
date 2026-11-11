@@ -19,8 +19,8 @@ class NightscoutClient:
         self.url = url
         self.token = token
 
-    async def _get(self, endpoint, count):
-        params = {"count": count}
+    async def _get(self, endpoint, count, **filters):
+        params = {"count": count, **filters}
         if self.token:
             params["token"] = self.token
         try:
@@ -49,3 +49,12 @@ class NightscoutClient:
             self._get("entries/sgv", 1),
             self._get("devicestatus", 20),
         )
+
+    async def fetch_age_events(self, event_types):
+        results = await asyncio.gather(
+            *(
+                self._get("treatments", 5, **{"find[eventType]": event_type})
+                for event_type in event_types
+            )
+        )
+        return [record for records in results for record in records]

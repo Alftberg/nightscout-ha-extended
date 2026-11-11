@@ -1,5 +1,6 @@
 """Poll Nightscout once for all entities."""
 
+import asyncio
 from datetime import datetime, timedelta, timezone
 import logging
 
@@ -7,8 +8,8 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import NightscoutAuthError, NightscoutError
-from .const import DOMAIN
-from .data import parse
+from .const import AGE_EVENTS, DOMAIN
+from .data import event_age_hours, parse
 
 
 class NightscoutCoordinator(DataUpdateCoordinator):
@@ -30,4 +31,18 @@ class NightscoutCoordinator(DataUpdateCoordinator):
             raise ConfigEntryAuthFailed(str(error)) from error
         except NightscoutError as error:
             raise UpdateFailed(str(error)) from error
-        return parse(entries, statuses, datetime.now(timezone.utc))
+        ages = await asyncio.gather(
+            *(self._async_fetch_age_events(types) for types in AGE_EVENTS.values())
+        )
+        now = datetime.now(timezone.utc)
+        data = parse(entries, statuses, now)
+        for (key, event_types), records in zip(AGE_EVENTS.items(), ages, strict=True):
+            data[key] = event_age_hours(records, event_types, now)
+        return data
+
+    async def _async_fetch_age_events(self, event_types):
+        try:
+            return await self.client.fetch_age_events(event_types)
+        except NightscoutError as error:
+            self.logger.debug("Could not read Nightscout age events: %s", error)
+            return []

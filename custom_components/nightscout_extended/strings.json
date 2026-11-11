@@ -56,6 +56,12 @@
       },
       "uploader_battery": {
         "name": "Uploader battery"
+      },
+      "cage": {
+        "name": "Infusion site age (CAGE)"
+      },
+      "sage": {
+        "name": "Glucose sensor age (SAGE)"
       }
     },
     "binary_sensor": {
