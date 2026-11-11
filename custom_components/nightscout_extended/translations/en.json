@@ -3,11 +3,16 @@
     "step": {
       "user": {
         "title": "Connect to Nightscout",
-        "data": {"url": "Nightscout base URL", "token": "Read-only access token (optional)"}
+        "data": {
+          "url": "Nightscout base URL",
+          "token": "Read-only access token (optional)"
+        }
       },
       "reauth_confirm": {
         "title": "Reconnect to Nightscout",
-        "data": {"token": "Read-only access token (optional)"}
+        "data": {
+          "token": "Read-only access token (optional)"
+        }
       }
     },
     "error": {
@@ -22,17 +27,47 @@
   },
   "entity": {
     "sensor": {
-      "glucose": {"name": "Glucose"},
-      "trend": {"name": "Glucose trend"},
-      "glucose_timestamp": {"name": "Glucose reading time"},
-      "iob": {"name": "Insulin on board"},
-      "cob": {"name": "Carbs on board"},
-      "reservoir": {"name": "Pump reservoir"},
-      "pump_battery": {"name": "Pump battery"},
-      "loop_timestamp": {"name": "Loop report time"}
+      "glucose": {
+        "name": "Glucose"
+      },
+      "trend": {
+        "name": "Glucose trend"
+      },
+      "glucose_timestamp": {
+        "name": "Glucose reading time"
+      },
+      "iob": {
+        "name": "Insulin on board"
+      },
+      "cob": {
+        "name": "Carbs on board"
+      },
+      "reservoir": {
+        "name": "Pump reservoir"
+      },
+      "pump_battery": {
+        "name": "Pump battery"
+      },
+      "loop_timestamp": {
+        "name": "Loop report time"
+      },
+      "pump_model": {
+        "name": "Pump model"
+      },
+      "uploader_battery": {
+        "name": "Uploader battery"
+      }
     },
     "binary_sensor": {
-      "loop_ok": {"name": "Last Loop cycle successful"}
+      "loop_ok": {
+        "name": "Last Loop cycle successful"
+      },
+      "pump_suspended": {
+        "name": "Pump delivery suspended"
+      },
+      "pump_bolusing": {
+        "name": "Pump delivering bolus"
+      }
     }
   }
 }

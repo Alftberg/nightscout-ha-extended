@@ -69,3 +69,26 @@ class ParserTest(unittest.TestCase):
             NOW,
         )
         self.assertEqual(set(data), {"glucose_timestamp"})
+
+    def test_uploader_battery_and_pump_status(self):
+        data = parse([], [{
+            "created_at": RECENT,
+            "pump": {"model": "Test pump", "suspended": False, "bolusing": True},
+            "uploader": {"battery": 73, "timestamp": RECENT},
+        }], NOW)
+        self.assertEqual(data["pump_model"], "Test pump")
+        self.assertIs(data["pump_suspended"], False)
+        self.assertIs(data["pump_bolusing"], True)
+        self.assertEqual(data["uploader_battery"], 73)
+        self.assertNotIn("pump_battery", data)
+        self.assertNotIn("reservoir", data)
+
+    def test_stale_uploader_and_nested_pump_status(self):
+        data = parse([], [{
+            "created_at": RECENT,
+            "pump": {"status": {"suspended": True, "bolusing": False}},
+            "uploader": {"battery": 73, "timestamp": STALE},
+        }], NOW)
+        self.assertIs(data["pump_suspended"], True)
+        self.assertIs(data["pump_bolusing"], False)
+        self.assertNotIn("uploader_battery", data)

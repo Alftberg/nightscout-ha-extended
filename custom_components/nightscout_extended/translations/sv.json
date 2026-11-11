@@ -3,11 +3,16 @@
     "step": {
       "user": {
         "title": "Anslut till Nightscout",
-        "data": {"url": "Nightscouts basadress", "token": "Åtkomsttoken med läsbehörighet (valfri)"}
+        "data": {
+          "url": "Nightscouts basadress",
+          "token": "Åtkomsttoken med läsbehörighet (valfri)"
+        }
       },
       "reauth_confirm": {
         "title": "Återanslut till Nightscout",
-        "data": {"token": "Åtkomsttoken med läsbehörighet (valfri)"}
+        "data": {
+          "token": "Åtkomsttoken med läsbehörighet (valfri)"
+        }
       }
     },
     "error": {
@@ -22,17 +27,47 @@
   },
   "entity": {
     "sensor": {
-      "glucose": {"name": "Glukos"},
-      "trend": {"name": "Glukostrend"},
-      "glucose_timestamp": {"name": "Tid för glukosmätning"},
-      "iob": {"name": "Aktivt insulin"},
-      "cob": {"name": "Aktiva kolhydrater"},
-      "reservoir": {"name": "Pumpens insulinreserv"},
-      "pump_battery": {"name": "Pumpbatteri"},
-      "loop_timestamp": {"name": "Tid för Loop-rapport"}
+      "glucose": {
+        "name": "Glukos"
+      },
+      "trend": {
+        "name": "Glukostrend"
+      },
+      "glucose_timestamp": {
+        "name": "Tid för glukosmätning"
+      },
+      "iob": {
+        "name": "Aktivt insulin"
+      },
+      "cob": {
+        "name": "Aktiva kolhydrater"
+      },
+      "reservoir": {
+        "name": "Pumpens insulinreserv"
+      },
+      "pump_battery": {
+        "name": "Pumpbatteri"
+      },
+      "loop_timestamp": {
+        "name": "Tid för Loop-rapport"
+      },
+      "pump_model": {
+        "name": "Pumpmodell"
+      },
+      "uploader_battery": {
+        "name": "Uppladdarens batteri"
+      }
     },
     "binary_sensor": {
-      "loop_ok": {"name": "Senaste Loop-cykeln lyckades"}
+      "loop_ok": {
+        "name": "Senaste Loop-cykeln lyckades"
+      },
+      "pump_suspended": {
+        "name": "Pumpens tillförsel pausad"
+      },
+      "pump_bolusing": {
+        "name": "Pumpen ger bolus"
+      }
     }
   }
 }

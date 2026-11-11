@@ -50,7 +50,7 @@ def parse(entries, statuses, now):
             if isinstance(entry.get("direction"), str):
                 data["trend"] = entry["direction"]
 
-    for key in ("loop", "pump"):
+    for key in ("loop", "pump", "uploader"):
         candidates = []
         for status in statuses:
             section = mapping(status.get(key))
@@ -63,9 +63,24 @@ def parse(entries, statuses, now):
         if not fresh(created, now):
             continue
 
+        if key == "uploader":
+            reported = timestamp(section.get("timestamp")) or created
+            battery = number(section.get("battery"))
+            if fresh(reported, now) and battery is not None and 0 <= battery <= 100:
+                data["uploader_battery"] = battery
+            continue
+
         if key == "pump":
             pump_time = timestamp(section.get("clock")) or created
             if fresh(pump_time, now):
+                model = section.get("model")
+                if isinstance(model, str) and model.strip():
+                    data["pump_model"] = model.strip()
+                status = mapping(section.get("status"))
+                for field in ("suspended", "bolusing"):
+                    value = section.get(field, status.get(field))
+                    if isinstance(value, bool):
+                        data[f"pump_{field}"] = value
                 reservoir = number(section.get("reservoir"))
                 battery = number(mapping(section.get("battery")).get("percent"))
                 if reservoir is not None and reservoir >= 0:

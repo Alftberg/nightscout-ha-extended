@@ -1,12 +1,13 @@
 # Nightscout Extended
 
-Nightscout Extended v0.1.0 läser glukos och Loop-telemetri från Nightscout API v1 till Home Assistant. Integrationen hämtar data varje minut och kräver Home Assistant 2026.1.0 eller senare.
+Nightscout Extended v0.1.1 läser glukos och Loop-telemetri från Nightscout API v1 till Home Assistant. Integrationen hämtar data varje minut och kräver Home Assistant 2026.1.0 eller senare.
 
 | Entitet | Källa |
 | --- | --- |
 | Glukos, trend och mättid | `entries/sgv` |
 | Aktivt insulin (IOB), aktiva kolhydrater (COB), Loop-resultat och rapporttid | `devicestatus.loop` |
-| Insulinreserv och batteri | `devicestatus.pump` |
+| Pumpmodell, pausad tillförsel, pågående bolus, insulinreserv och pumpbatteri | `devicestatus.pump` |
+| Uppladdarens batteri | `devicestatus.uploader.battery` |
 
 Glukos hämtas i mg/dL. Home Assistant hanterar visningsenheten för glukossensorn. Loop-resultatet visar utfallet i senaste aktuella Loop-rapporten. Saknade eller mer än 15 minuter gamla värden visas som okända. Mättiden för glukos kan fortfarande visas så att du kan se när senaste värdet kom in. Vid anslutningsfel blir entiteterna otillgängliga.
 

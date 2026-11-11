@@ -43,6 +43,14 @@ DESCRIPTIONS = (
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
+    SensorEntityDescription(key="pump_model", translation_key="pump_model"),
+    SensorEntityDescription(
+        key="uploader_battery",
+        translation_key="uploader_battery",
+        device_class=SensorDeviceClass.BATTERY,
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
     SensorEntityDescription(
         key="loop_timestamp",
         translation_key="loop_timestamp",

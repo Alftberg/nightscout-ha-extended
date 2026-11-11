@@ -1,17 +1,20 @@
-"""Report the last Loop result."""
+"""Report Loop and pump status."""
 
 from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorEntityDescription
 
 from .entity import NightscoutEntity
 
-DESCRIPTION = BinarySensorEntityDescription(key="loop_ok", translation_key="loop_ok")
+DESCRIPTIONS = tuple(
+    BinarySensorEntityDescription(key=key, translation_key=key)
+    for key in ("loop_ok", "pump_suspended", "pump_bolusing")
+)
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
-    async_add_entities([LoopStatus(entry, DESCRIPTION)])
+    async_add_entities(NightscoutBinarySensor(entry, description) for description in DESCRIPTIONS)
 
 
-class LoopStatus(NightscoutEntity, BinarySensorEntity):
+class NightscoutBinarySensor(NightscoutEntity, BinarySensorEntity):
     @property
     def is_on(self):
         return self.value
