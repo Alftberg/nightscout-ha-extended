@@ -6,9 +6,9 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.const import PERCENTAGE, UnitOfMass, UnitOfTime
+from homeassistant.const import CONF_UNIT_OF_MEASUREMENT, PERCENTAGE, UnitOfMass, UnitOfTime
 
-from .const import AGE_EVENTS
+from .const import AGE_EVENTS, GLUCOSE_SENSOR_KEYS
 from .entity import NightscoutEntity
 
 DESCRIPTIONS = (
@@ -88,6 +88,13 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 
 class NightscoutSensor(NightscoutEntity, SensorEntity):
+    def __init__(self, entry, description):
+        super().__init__(entry, description)
+        if description.key in GLUCOSE_SENSOR_KEYS:
+            self._attr_suggested_unit_of_measurement = entry.options.get(
+                CONF_UNIT_OF_MEASUREMENT
+            )
+
     @property
     def native_value(self):
         return self.value

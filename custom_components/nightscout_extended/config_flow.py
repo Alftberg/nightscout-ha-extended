@@ -3,13 +3,15 @@
 import voluptuous as vol
 from yarl import URL
 
-from homeassistant.config_entries import ConfigFlow
-from homeassistant.const import CONF_TOKEN, CONF_URL
+from homeassistant.config_entries import ConfigFlow, OptionsFlow
+from homeassistant.const import CONF_TOKEN, CONF_UNIT_OF_MEASUREMENT, CONF_URL
+from homeassistant.core import callback
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import TextSelector, TextSelectorConfig, TextSelectorType
 
 from .api import NightscoutAuthError, NightscoutClient, NightscoutError
-from .const import DOMAIN
+from .const import DOMAIN, GLUCOSE_SENSOR_KEYS, GLUCOSE_UNITS
 
 
 def normalize_url(value):
@@ -27,6 +29,11 @@ def normalize_url(value):
 
 class NightscoutConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        return NightscoutOptionsFlow()
 
     async def async_step_user(self, user_input=None):
         return await self._async_configure("user", user_input)
@@ -70,3 +77,38 @@ class NightscoutConfigFlow(ConfigFlow, domain=DOMAIN):
             TextSelectorConfig(type=TextSelectorType.PASSWORD)
         )
         return self.async_show_form(step_id=step, data_schema=vol.Schema(fields), errors=errors)
+
+class NightscoutOptionsFlow(OptionsFlow):
+    async def async_step_init(self, user_input=None):
+        entry = self.config_entry
+        registry = er.async_get(self.hass)
+        entity_ids = [
+            registry.async_get_entity_id("sensor", DOMAIN, f"{entry.entry_id}_{key}")
+            for key in GLUCOSE_SENSOR_KEYS
+        ]
+        if user_input is not None:
+            unit = user_input[CONF_UNIT_OF_MEASUREMENT]
+            for entity_id in entity_ids:
+                if entity_id is not None:
+                    sensor_options = registry.async_get(entity_id).options.get("sensor", {})
+                    registry.async_update_entity_options(
+                        entity_id,
+                        "sensor",
+                        {**sensor_options, CONF_UNIT_OF_MEASUREMENT: unit},
+                    )
+            return self.async_create_entry(title="", data={**entry.options, **user_input})
+
+        unit = entry.options.get(CONF_UNIT_OF_MEASUREMENT)
+        if unit is None and entity_ids[0] is not None:
+            state = self.hass.states.get(entity_ids[0])
+            if state is not None:
+                unit = state.attributes.get(CONF_UNIT_OF_MEASUREMENT)
+        field = (
+            vol.Required(CONF_UNIT_OF_MEASUREMENT, default=unit)
+            if unit in GLUCOSE_UNITS
+            else vol.Required(CONF_UNIT_OF_MEASUREMENT)
+        )
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema({field: vol.In(GLUCOSE_UNITS)}),
+        )

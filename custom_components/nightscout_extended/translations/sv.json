@@ -96,5 +96,15 @@
         "name": "Loop-override aktiv"
       }
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Visningsenhet för glukos",
+        "data": {
+          "unit_of_measurement": "Måttenhet för glukos och prognos"
+        }
+      }
+    }
   }
 }

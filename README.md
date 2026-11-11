@@ -1,6 +1,6 @@
 # Nightscout Extended
 
-Nightscout Extended v0.1.3 läser glukos och Loop-telemetri från Nightscout API v1 till Home Assistant. Integrationen hämtar data varje minut och kräver Home Assistant 2026.1.0 eller senare.
+Nightscout Extended v0.1.4 läser glukos och Loop-telemetri från Nightscout API v1 till Home Assistant. Integrationen hämtar data varje minut och kräver Home Assistant 2026.1.0 eller senare.
 
 | Entitet | Källa |
 | --- | --- |
@@ -23,7 +23,7 @@ Glukosprognos visar sista giltiga prognospunkten. Entitetens attribut `forecast_
 
 CAGE, SAGE, IAGE och BAGE visar timmar sedan respektive händelse. De visas som okända om händelsen saknas eller om integrationen inte kan läsa `treatments`.
 
-Glukos hämtas i mg/dL. Home Assistant hanterar visningsenheten för glukossensorn. Loop-resultatet visar utfallet i senaste aktuella Loop-rapporten. Saknade eller mer än 15 minuter gamla värden visas som okända. Mättiden för glukos kan fortfarande visas så att du kan se när senaste värdet kom in. Vid anslutningsfel blir entiteterna otillgängliga.
+Glukos hämtas i mg/dL. Välj mmol/L eller mg/dL under **Inställningar → Enheter och tjänster → Nightscout Extended → Konfigurera**. Valet uppdaterar visningsenheten för både Glukos och Glukosprognos. Loop-resultatet visar utfallet i senaste aktuella Loop-rapporten. Saknade eller mer än 15 minuter gamla värden visas som okända. Mättiden för glukos kan fortfarande visas så att du kan se när senaste värdet kom in. Vid anslutningsfel blir entiteterna otillgängliga.
 
 ## Installera via HACS
 

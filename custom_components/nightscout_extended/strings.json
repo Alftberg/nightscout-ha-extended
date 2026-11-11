@@ -96,5 +96,15 @@
         "name": "Loop override active"
       }
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Glucose display unit",
+        "data": {
+          "unit_of_measurement": "Unit for glucose and forecast"
+        }
+      }
+    }
   }
 }
