@@ -1,0 +1,198 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Anslut till Nightscout",
+        "data": {
+          "url": "Nightscout url",
+          "token": "Token med läsbehörighet"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Återanslut till Nightscout",
+        "data": {
+          "token": "Åtkomsttoken med läsbehörighet (valfri)"
+        }
+      }
+    },
+    "error": {
+      "invalid_url": "Ange en giltig Nightscout-adress utan inloggningsuppgifter, frågeparametrar eller fragment.",
+      "invalid_auth": "Nightscout nekade åtkomst. Kontrollera token och dess läsbehörighet.",
+      "cannot_connect": "Det gick inte att läsa Nightscouts API. Kontrollera adressen och att servern är tillgänglig."
+    },
+    "abort": {
+      "already_configured": "Den här Nightscout-servern är redan konfigurerad.",
+      "reauth_successful": "Åtkomsten till Nightscout har återställts."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "glucose": {
+        "name": "Glukos"
+      },
+      "trend": {
+        "name": "Glukostrend"
+      },
+      "glucose_timestamp": {
+        "name": "Tid för glukosmätning"
+      },
+      "iob": {
+        "name": "Aktivt insulin"
+      },
+      "cob": {
+        "name": "Aktiva kolhydrater"
+      },
+      "reservoir": {
+        "name": "Pumpens insulinreserv"
+      },
+      "pump_battery": {
+        "name": "Pumpbatteri"
+      },
+      "loop_timestamp": {
+        "name": "Tid för Loop-rapport"
+      },
+      "pump_model": {
+        "name": "Pumpmodell"
+      },
+      "uploader_battery": {
+        "name": "Uppladdarens batteri"
+      },
+      "cage": {
+        "name": "Infusionsställets ålder (CAGE)"
+      },
+      "sage": {
+        "name": "Glukossensorns ålder (SAGE)"
+      },
+      "iage": {
+        "name": "Tid sedan insulinbyte (IAGE)"
+      },
+      "bage": {
+        "name": "Tid sedan pumpbatteribyte (BAGE)"
+      },
+      "loop_version": {
+        "name": "Loop-version"
+      },
+      "pump_timestamp": {
+        "name": "Tid för pumpstatus"
+      },
+      "glucose_forecast": {
+        "name": "Glukosprognos"
+      },
+      "glucose_delta": {
+        "name": "Glukosförändring"
+      },
+      "trend_text": {
+        "name": "Glukostrend (text)",
+        "state": {
+          "double_up": "Stiger mycket snabbt",
+          "single_up": "Stiger snabbt",
+          "forty_five_up": "Stiger långsamt",
+          "flat": "Stabilt",
+          "forty_five_down": "Sjunker långsamt",
+          "single_down": "Sjunker snabbt",
+          "double_down": "Sjunker mycket snabbt",
+          "no_trend": "Ingen trend",
+          "not_computable": "Kan inte beräknas",
+          "rate_out_of_range": "Utanför mätområdet"
+        }
+      },
+      "override_profile": {
+        "name": "Aktiv temporär profil"
+      },
+      "glucose_rate": {
+        "name": "Beräknad trendhastighet"
+      },
+      "temporary_basal": {
+        "name": "Loggad temporär basal"
+      },
+      "last_carbs": {
+        "name": "Senaste kolhydratkorrigering"
+      },
+      "last_correction_bolus": {
+        "name": "Senaste korrektionsbolus"
+      },
+      "saved_profile": {
+        "name": "Sparad standardprofil"
+      },
+      "scheduled_basal": {
+        "name": "Schemalagd basal"
+      },
+      "cgm_model": {
+        "name": "Glukossensorns modell"
+      }
+    },
+    "binary_sensor": {
+      "loop_ok": {
+        "name": "Senaste Loop-cykeln lyckades"
+      },
+      "pump_suspended": {
+        "name": "Pumpens tillförsel pausad"
+      },
+      "pump_bolusing": {
+        "name": "Pumpen ger bolus"
+      },
+      "uploader_charging": {
+        "name": "Uppladdaren laddas"
+      },
+      "override_active": {
+        "name": "Loop-override aktiv"
+      }
+    },
+    "update": {
+      "loop_update": {
+        "name": "Loop-uppdatering"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Inställningar",
+        "data": {
+          "dashboard_tab_name": "Namn",
+          "unit_of_measurement": "Enhet för glukos",
+          "graph_series": "Alternativ för graf"
+        },
+        "sections": {
+          "band_settings": {
+            "name": "Grönt glukosintervall",
+            "data": {
+              "target_band": "Visa grönt glukosintervall",
+              "target_low": "Nedre gräns (mmol/L)",
+              "target_high": "Övre gräns (mmol/L)"
+            }
+          },
+          "glucose_colors": {
+            "name": "Färger för aktuellt glukos",
+            "data": {
+              "color_below": "Under intervallet (#RRGGBB)",
+              "color_in_range": "Inom intervallet (#RRGGBB)",
+              "color_above": "Över intervallet (#RRGGBB)"
+            }
+          },
+          "axis_settings": {
+            "name": "Grafens skala",
+            "data": {
+              "axis_low": "Lägsta värde (mmol/L)",
+              "axis_high": "Högsta värde (mmol/L)"
+            }
+          }
+        }
+      }
+    },
+    "error": {
+      "invalid_glucose_color": "Ange färger som hexkod, till exempel #20833b.",
+      "invalid_target_range": "Ange en nedre gräns över noll och en övre gräns som är högre.",
+      "invalid_axis_range": "Ange två heltal där det lägsta värdet är minst noll och det högsta är större."
+    }
+  },
+  "selector": {
+    "graph_series": {
+      "options": {
+        "glucose": "Glukos",
+        "bolus": "Bolus",
+        "temporary_basal": "Basal"
+      }
+    }
+  }
+}

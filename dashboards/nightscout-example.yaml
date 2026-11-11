@@ -1,0 +1,198 @@
+title: Nightscout
+views:
+  - title: Glucose
+    path: nightscout
+    icon: mdi:chart-line
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: custom:apexcharts-card
+            graph_span: 6h
+            header:
+              show: true
+              title: Glucose · last 6 hours
+            apex_config:
+              chart:
+                height: 340
+              markers:
+                size: 4
+                hover:
+                  size: 7
+              tooltip:
+                shared: false
+                intersect: true
+                x:
+                  format: dd MMM HH:mm:ss
+            series:
+              - entity: sensor.nightscout_glukos
+                name: Measured glucose
+                color: '#2674d9'
+                curve: straight
+                stroke_width: 2
+                float_precision: 2
+                extend_to: false
+            grid_options:
+              columns: full
+          - type: custom:apexcharts-card
+            graph_span: 6h
+            header:
+              show: true
+              title: Basal and insulin on board · last 6 hours
+            apex_config:
+              chart:
+                height: 230
+              tooltip:
+                shared: false
+                x:
+                  format: dd MMM HH:mm:ss
+            yaxis:
+              - id: basal
+                min: 0
+                apex_config:
+                  title:
+                    text: Basal (U/h)
+              - id: iob
+                opposite: true
+                apex_config:
+                  title:
+                    text: Insulin on board (U)
+            series:
+              - entity: sensor.nightscout_loggad_temporar_basal
+                name: Calculated basal
+                yaxis_id: basal
+                color: '#00897b'
+                curve: stepline
+                stroke_width: 2
+                float_precision: 2
+                extend_to: false
+                show:
+                  legend_value: false
+                data_generator: |
+                  return entity.attributes.combined_basal_history || [];
+              - entity: sensor.nightscout_schemalagd_basal
+                name: Scheduled basal
+                yaxis_id: basal
+                color: '#78849a'
+                curve: stepline
+                stroke_width: 2
+                stroke_dash: 5
+                float_precision: 2
+              - entity: sensor.nightscout_aktivt_insulin
+                name: Insulin on board
+                yaxis_id: iob
+                color: '#7956c5'
+                curve: straight
+                stroke_width: 2
+                float_precision: 2
+                extend_to: false
+            grid_options:
+              columns: full
+          - type: tile
+            entity: sensor.nightscout_glukos
+            name: Glucose
+            color: teal
+          - type: tile
+            entity: sensor.nightscout_glukostrend_text
+            name: Trend
+            icon: mdi:trending-up
+            color: teal
+          - type: tile
+            entity: sensor.nightscout_glukosforandring
+            name: Change
+            icon: mdi:swap-vertical
+          - type: tile
+            entity: sensor.nightscout_glukosprognos
+            name: Final forecast value
+            icon: mdi:chart-timeline-variant
+            color: blue
+      - type: grid
+        cards:
+          - type: heading
+            heading: Loop and treatment
+            icon: mdi:sync
+          - type: tile
+            entity: sensor.nightscout_aktivt_insulin
+            name: Insulin on board
+            icon: mdi:needle
+            color: indigo
+          - type: tile
+            entity: sensor.nightscout_aktiva_kolhydrater
+            name: Carbs on board
+            icon: mdi:food-apple-outline
+            color: amber
+          - type: tile
+            entity: sensor.nightscout_aktiv_temporar_profil
+            name: Temporary profile
+            icon: mdi:tune-variant
+          - type: tile
+            entity: binary_sensor.nightscout_senaste_loop_cykeln_lyckades
+            name: Latest Loop cycle
+            icon: mdi:sync
+          - type: tile
+            entity: sensor.nightscout_loggad_temporar_basal
+            name: Logged temporary basal
+            icon: mdi:chart-step
+          - type: tile
+            entity: sensor.nightscout_schemalagd_basal
+            name: Scheduled basal
+            icon: mdi:calendar-clock
+      - type: grid
+        cards:
+          - type: heading
+            heading: Sensor, pod and uploader
+            icon: mdi:devices
+          - type: markdown
+            title: Pod · Omnipod DASH
+            content: >-
+              {% set age = states('sensor.nightscout_infusionsstallets_alder_cage') | float(none) %}
+              {% set unit = state_attr('sensor.nightscout_infusionsstallets_alder_cage', 'unit_of_measurement') %}
+              {% set seconds = {'s': 1, 'min': 60, 'h': 3600, 'd': 86400}.get(unit) %}
+              {% if age is none or seconds is none %}
+              Age unavailable in Nightscout.
+              {% else %}
+              {% set remaining = 72 * 3600 - age * seconds %}
+              {% set minutes = (remaining / 60) | round(0, 'ceil') | int %}
+              {% if remaining <= 0 %}
+              **Scheduled replacement time has passed**
+              {% else %}
+              **{{ minutes // 1440 }} d {{ (minutes % 1440) // 60 }} h {{ minutes % 60 }} min remaining**
+              {% endif %}
+              {% endif %}
+          - type: tile
+            entity: sensor.nightscout_infusionsstallets_alder_cage
+            name: Pod age · CAGE
+            icon: mdi:timer-outline
+            color: amber
+          - type: markdown
+            title: Sensor · Dexcom G7
+            content: >-
+              {% set age = states('sensor.nightscout_glukossensorns_alder_sage') | float(none) %}
+              {% set unit = state_attr('sensor.nightscout_glukossensorns_alder_sage', 'unit_of_measurement') %}
+              {% set seconds = {'s': 1, 'min': 60, 'h': 3600, 'd': 86400}.get(unit) %}
+              {% if age is none or seconds is none %}
+              Age unavailable in Nightscout.
+              {% else %}
+              {% set remaining = 240 * 3600 - age * seconds %}
+              {% set minutes = (remaining / 60) | round(0, 'ceil') | int %}
+              {% if remaining <= 0 %}
+              **Scheduled replacement time has passed**
+              {% else %}
+              **{{ minutes // 1440 }} d {{ (minutes % 1440) // 60 }} h {{ minutes % 60 }} min remaining**
+              {% endif %}
+              {% endif %}
+          - type: tile
+            entity: sensor.nightscout_glukossensorns_alder_sage
+            name: Sensor age · SAGE
+            icon: mdi:timer-outline
+            color: teal
+          - type: tile
+            entity: sensor.nightscout_uppladdarens_batteri
+            name: Uploader battery
+            color: green
+          - type: tile
+            entity: sensor.nightscout_tid_for_glukosmatning
+            name: Latest reading
+            icon: mdi:clock-outline

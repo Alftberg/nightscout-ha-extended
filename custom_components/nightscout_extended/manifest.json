@@ -1,0 +1,13 @@
+{
+  "domain": "nightscout_extended",
+  "name": "Nightscout Extended",
+  "codeowners": ["@Alftberg"],
+  "config_flow": true,
+  "documentation": "https://github.com/Alftberg/nightscout-ha-extended",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/Alftberg/nightscout-ha-extended/issues",
+  "dependencies": ["lovelace", "persistent_notification", "websocket_api"],
+  "requirements": [],
+  "version": "0.1.29"
+}
