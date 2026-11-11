@@ -46,14 +46,21 @@ class NightscoutClient:
 
     async def fetch(self):
         return await asyncio.gather(
-            self._get("entries/sgv", 1),
+            self._get("entries/sgv", 5),
             self._get("devicestatus", 20),
         )
 
     async def fetch_age_events(self, event_types):
         results = await asyncio.gather(
             *(
-                self._get("treatments", 5, **{"find[eventType]": event_type})
+                self._get(
+                    "treatments",
+                    5,
+                    **{
+                        "find[eventType]": event_type,
+                        "find[created_at][$gte]": "1970-01-01",
+                    },
+                )
                 for event_type in event_types
             )
         )

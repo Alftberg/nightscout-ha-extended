@@ -77,6 +77,24 @@
       },
       "glucose_forecast": {
         "name": "Glukosprognos"
+      },
+      "glucose_delta": {
+        "name": "Glukosförändring"
+      },
+      "trend_text": {
+        "name": "Glukostrend (text)",
+        "state": {
+          "double_up": "Stiger mycket snabbt",
+          "single_up": "Stiger snabbt",
+          "forty_five_up": "Stiger långsamt",
+          "flat": "Stabilt",
+          "forty_five_down": "Sjunker långsamt",
+          "single_down": "Sjunker snabbt",
+          "double_down": "Sjunker mycket snabbt",
+          "no_trend": "Ingen trend",
+          "not_computable": "Kan inte beräknas",
+          "rate_out_of_range": "Utanför mätområdet"
+        }
       }
     },
     "binary_sensor": {

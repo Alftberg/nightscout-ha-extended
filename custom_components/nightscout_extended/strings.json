@@ -77,6 +77,24 @@
       },
       "glucose_forecast": {
         "name": "Glucose forecast"
+      },
+      "glucose_delta": {
+        "name": "Glucose change"
+      },
+      "trend_text": {
+        "name": "Glucose trend (text)",
+        "state": {
+          "double_up": "Rising very quickly",
+          "single_up": "Rising quickly",
+          "forty_five_up": "Rising slowly",
+          "flat": "Steady",
+          "forty_five_down": "Falling slowly",
+          "single_down": "Falling quickly",
+          "double_down": "Falling very quickly",
+          "no_trend": "No trend",
+          "not_computable": "Cannot be calculated",
+          "rate_out_of_range": "Rate out of range"
+        }
       }
     },
     "binary_sensor": {

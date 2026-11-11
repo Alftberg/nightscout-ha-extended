@@ -139,3 +139,18 @@ class ParserTest(unittest.TestCase):
         }], NOW)
         self.assertNotIn("override_active", data)
         self.assertNotIn("glucose_forecast", data)
+
+    def test_glucose_delta_skips_duplicate_timestamp(self):
+        data = parse([
+            {"dateString": NOW.isoformat(), "sgv": 100},
+            {"dateString": NOW.isoformat(), "sgv": 102},
+            {"dateString": RECENT, "sgv": 104},
+        ], [], NOW)
+        self.assertEqual(data["glucose_delta"], -4)
+
+    def test_glucose_delta_requires_two_fresh_readings(self):
+        data = parse([
+            {"dateString": NOW.isoformat(), "sgv": 100},
+            {"dateString": STALE, "sgv": 104},
+        ], [], NOW)
+        self.assertNotIn("glucose_delta", data)

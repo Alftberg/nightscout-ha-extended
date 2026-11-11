@@ -8,7 +8,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import CONF_UNIT_OF_MEASUREMENT, PERCENTAGE, UnitOfMass, UnitOfTime
 
-from .const import AGE_EVENTS, GLUCOSE_SENSOR_KEYS
+from .const import AGE_EVENTS, GLUCOSE_SENSOR_KEYS, TREND_STATES
 from .entity import NightscoutEntity
 
 DESCRIPTIONS = (
@@ -20,6 +20,19 @@ DESCRIPTIONS = (
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(key="trend", translation_key="trend"),
+    SensorEntityDescription(
+        key="trend_text",
+        translation_key="trend_text",
+        device_class=SensorDeviceClass.ENUM,
+        options=list(TREND_STATES.values()),
+    ),
+    SensorEntityDescription(
+        key="glucose_delta",
+        translation_key="glucose_delta",
+        device_class=SensorDeviceClass.BLOOD_GLUCOSE_CONCENTRATION,
+        native_unit_of_measurement="mg/dL",
+        suggested_display_precision=1,
+    ),
     SensorEntityDescription(
         key="glucose_timestamp",
         translation_key="glucose_timestamp",
@@ -97,6 +110,8 @@ class NightscoutSensor(NightscoutEntity, SensorEntity):
 
     @property
     def native_value(self):
+        if self.entity_description.key == "trend_text":
+            return TREND_STATES.get(self.coordinator.data.get("trend"))
         return self.value
 
     @property

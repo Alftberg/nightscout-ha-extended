@@ -47,6 +47,20 @@ def parse(entries, statuses, now):
         glucose = number(entry.get("sgv"))
         if fresh(measured, now) and glucose is not None and glucose >= 39:
             data["glucose"] = glucose
+            for previous in entries[1:]:
+                previous_time = timestamp(previous.get("date")) or timestamp(
+                    previous.get("dateString")
+                )
+                if previous_time is None or previous_time >= measured:
+                    continue
+                previous_glucose = number(previous.get("sgv"))
+                if (
+                    fresh(previous_time, now)
+                    and previous_glucose is not None
+                    and previous_glucose >= 39
+                ):
+                    data["glucose_delta"] = glucose - previous_glucose
+                break
             if isinstance(entry.get("direction"), str):
                 data["trend"] = entry["direction"]
 
