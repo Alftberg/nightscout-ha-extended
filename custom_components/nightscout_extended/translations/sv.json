@@ -95,6 +95,9 @@
           "not_computable": "Kan inte beräknas",
           "rate_out_of_range": "Utanför mätområdet"
         }
+      },
+      "override_profile": {
+        "name": "Aktiv temporär profil"
       }
     },
     "binary_sensor": {

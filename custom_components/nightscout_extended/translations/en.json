@@ -95,6 +95,9 @@
           "not_computable": "Cannot be calculated",
           "rate_out_of_range": "Rate out of range"
         }
+      },
+      "override_profile": {
+        "name": "Active temporary profile"
       }
     },
     "binary_sensor": {

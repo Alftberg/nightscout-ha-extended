@@ -85,6 +85,18 @@ def parse(entries, statuses, now):
                 active = section.get("active")
                 if isinstance(active, bool):
                     data["override_active"] = active
+                    if active:
+                        attributes = {}
+                        multiplier = number(section.get("multiplier"))
+                        if multiplier is not None and 0 <= multiplier <= 100:
+                            attributes["insulin_scale_percent"] = multiplier * 100
+                        target = mapping(section.get("currentCorrectionRange"))
+                        low = number(target.get("minValue"))
+                        high = number(target.get("maxValue"))
+                        if low is not None and high is not None and 0 < low <= high:
+                            attributes["target_min_mg_dl"] = low
+                            attributes["target_max_mg_dl"] = high
+                        data["override_attributes"] = attributes
                 continue
             charging = section.get("isCharging")
             if isinstance(charging, bool):
@@ -165,3 +177,39 @@ def event_age_hours(records, event_types, now):
     if latest is None:
         return None
     return (now - latest).total_seconds() / 3600
+
+def active_override_profile(records, now):
+    """Get the latest started override, provided it has not ended."""
+    events = []
+    for record in records:
+        if record.get("eventType") not in ("Temporary Override", "Temporary Override Cancel"):
+            continue
+        started = timestamp(record.get("created_at"))
+        if started is not None and started <= now:
+            events.append((started, record))
+    if not events:
+        return None, {}
+
+    started, record = max(
+        events,
+        key=lambda event: (event[0], event[1]["eventType"] == "Temporary Override Cancel"),
+    )
+    if record["eventType"] == "Temporary Override Cancel":
+        return None, {}
+
+    attributes = {"started_at": started.isoformat()}
+    duration = number(record.get("duration"))
+    if duration is not None and duration > 0:
+        try:
+            ends = started + timedelta(minutes=duration)
+        except OverflowError:
+            return None, {}
+        if ends <= now:
+            return None, {}
+        attributes["ends_at"] = ends.isoformat()
+
+    for key in ("reasonDisplay", "reason"):
+        name = record.get(key)
+        if isinstance(name, str) and name.strip():
+            return name.strip()[:255], attributes
+    return None, attributes

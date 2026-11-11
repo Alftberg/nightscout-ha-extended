@@ -154,3 +154,33 @@ class ParserTest(unittest.TestCase):
             {"dateString": STALE, "sgv": 104},
         ], [], NOW)
         self.assertNotIn("glucose_delta", data)
+
+    def test_active_override_without_fixed_end(self):
+        name, attributes = parser["active_override_profile"]([
+            {"eventType": "Temporary Override", "created_at": RECENT,
+             "reason": "exercise", "reasonDisplay": "Exercise", "duration": 0},
+        ], NOW)
+        self.assertEqual(name, "Exercise")
+        self.assertEqual(attributes, {"started_at": RECENT})
+
+    def test_cancelled_and_expired_overrides(self):
+        profile = parser["active_override_profile"]
+        started = {"eventType": "Temporary Override", "created_at": RECENT,
+                   "reason": "exercise", "duration": 1}
+        self.assertEqual(profile([started], NOW), (None, {}))
+        started["duration"] = 10
+        self.assertEqual(profile([started], NOW)[0], "exercise")
+        cancel = {"eventType": "Temporary Override Cancel", "created_at": RECENT}
+        self.assertEqual(profile([cancel, started], NOW), (None, {}))
+
+    def test_override_status_attributes(self):
+        data = parse([], [{
+            "created_at": RECENT,
+            "override": {"active": True, "multiplier": 0.5,
+                         "currentCorrectionRange": {"minValue": 100, "maxValue": 110}},
+        }], NOW)
+        self.assertEqual(data["override_attributes"], {
+            "insulin_scale_percent": 50,
+            "target_min_mg_dl": 100,
+            "target_max_mg_dl": 110,
+        })

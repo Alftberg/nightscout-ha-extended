@@ -1,6 +1,6 @@
 # Nightscout Extended
 
-Nightscout Extended v0.1.5 läser glukos och Loop-telemetri från Nightscout API v1 till Home Assistant. Integrationen hämtar data varje minut och kräver Home Assistant 2026.1.0 eller senare.
+Nightscout Extended v0.1.6 läser glukos och Loop-telemetri från Nightscout API v1 till Home Assistant. Integrationen hämtar data varje minut och kräver Home Assistant 2026.1.0 eller senare.
 
 | Entitet | Källa |
 | --- | --- |
@@ -11,6 +11,9 @@ Nightscout Extended v0.1.5 läser glukos och Loop-telemetri från Nightscout API
 | Loop-version och glukosprognos | `devicestatus.loop` |
 | Tid för pumpstatus | `devicestatus.pump.clock`, annars rapportens tid |
 | Loop-override aktiv | `devicestatus.override.active` |
+| Aktiv temporär profil | `Temporary Override` i `treatments` och aktiv Loop-status |
+
+Aktiv temporär profil visar profilnamnet. Starttid och eventuell sluttid finns som attribut när en pågående händelse kan matchas. När Loop rapporterar värdena finns även `insulin_scale_percent`, `target_min_mg_dl` och `target_max_mg_dl` som attribut. Ett override med varaktighet noll saknar fast sluttid.
 | Infusionsställets ålder (CAGE) | Senaste `Site Change` i `treatments` |
 | Glukossensorns ålder (SAGE) | Senaste `Sensor Start` eller `Sensor Change` i `treatments` |
 

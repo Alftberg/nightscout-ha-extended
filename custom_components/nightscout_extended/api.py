@@ -50,7 +50,7 @@ class NightscoutClient:
             self._get("devicestatus", 20),
         )
 
-    async def fetch_age_events(self, event_types):
+    async def fetch_treatment_events(self, event_types):
         results = await asyncio.gather(
             *(
                 self._get(

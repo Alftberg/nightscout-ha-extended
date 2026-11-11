@@ -24,3 +24,5 @@ TREND_STATES = {
     "NOT COMPUTABLE": "not_computable",
     "RATE OUT OF RANGE": "rate_out_of_range",
 }
+
+OVERRIDE_EVENTS = ("Temporary Override", "Temporary Override Cancel")

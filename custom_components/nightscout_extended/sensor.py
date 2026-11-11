@@ -76,6 +76,7 @@ DESCRIPTIONS = (
         )
         for key in AGE_EVENTS
     ),
+    SensorEntityDescription(key="override_profile", translation_key="override_profile"),
     SensorEntityDescription(key="loop_version", translation_key="loop_version"),
     SensorEntityDescription(
         key="pump_timestamp",
@@ -116,6 +117,8 @@ class NightscoutSensor(NightscoutEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self):
+        if self.entity_description.key == "override_profile" and self.available:
+            return self.coordinator.data.get("override_attributes")
         if self.entity_description.key == "glucose_forecast" and self.value is not None:
             return {"forecast_points": self.coordinator.data["forecast_points"]}
         return None
