@@ -1,17 +1,27 @@
 # Nightscout Extended
 
-Nightscout Extended v0.1.2 läser glukos och Loop-telemetri från Nightscout API v1 till Home Assistant. Integrationen hämtar data varje minut och kräver Home Assistant 2026.1.0 eller senare.
+Nightscout Extended v0.1.3 läser glukos och Loop-telemetri från Nightscout API v1 till Home Assistant. Integrationen hämtar data varje minut och kräver Home Assistant 2026.1.0 eller senare.
 
 | Entitet | Källa |
 | --- | --- |
 | Glukos, trend och mättid | `entries/sgv` |
 | Aktivt insulin (IOB), aktiva kolhydrater (COB), Loop-resultat och rapporttid | `devicestatus.loop` |
 | Pumpmodell, pausad tillförsel, pågående bolus, insulinreserv och pumpbatteri | `devicestatus.pump` |
-| Uppladdarens batteri | `devicestatus.uploader.battery` |
+| Uppladdarens batteri och laddstatus | `devicestatus.uploader` |
+| Loop-version och glukosprognos | `devicestatus.loop` |
+| Tid för pumpstatus | `devicestatus.pump.clock`, annars rapportens tid |
+| Loop-override aktiv | `devicestatus.override.active` |
 | Infusionsställets ålder (CAGE) | Senaste `Site Change` i `treatments` |
 | Glukossensorns ålder (SAGE) | Senaste `Sensor Start` eller `Sensor Change` i `treatments` |
 
-CAGE och SAGE visar timmar sedan respektive händelse. De visas som okända om händelsen saknas eller om integrationen inte kan läsa `treatments`.
+Glukosprognos visar sista giltiga prognospunkten. Entitetens attribut `forecast_points` innehåller tidsstämplar och värden i mg/dL för grafkort som stöder prognosdata. Attributvärdena är i mg/dL även om entiteten visas i mmol/L.
+
+| Ytterligare ålderssensor | Källa |
+| --- | --- |
+| Tid sedan insulinbyte (IAGE) | Senaste `Insulin Change` i `treatments` |
+| Tid sedan pumpbatteribyte (BAGE) | Senaste `Pump Battery Change` i `treatments` |
+
+CAGE, SAGE, IAGE och BAGE visar timmar sedan respektive händelse. De visas som okända om händelsen saknas eller om integrationen inte kan läsa `treatments`.
 
 Glukos hämtas i mg/dL. Home Assistant hanterar visningsenheten för glukossensorn. Loop-resultatet visar utfallet i senaste aktuella Loop-rapporten. Saknade eller mer än 15 minuter gamla värden visas som okända. Mättiden för glukos kan fortfarande visas så att du kan se när senaste värdet kom in. Vid anslutningsfel blir entiteterna otillgängliga.
 

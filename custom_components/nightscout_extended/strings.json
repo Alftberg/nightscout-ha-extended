@@ -62,6 +62,21 @@
       },
       "sage": {
         "name": "Glucose sensor age (SAGE)"
+      },
+      "iage": {
+        "name": "Time since insulin change (IAGE)"
+      },
+      "bage": {
+        "name": "Time since pump battery change (BAGE)"
+      },
+      "loop_version": {
+        "name": "Loop version"
+      },
+      "pump_timestamp": {
+        "name": "Pump status time"
+      },
+      "glucose_forecast": {
+        "name": "Glucose forecast"
       }
     },
     "binary_sensor": {
@@ -73,6 +88,12 @@
       },
       "pump_bolusing": {
         "name": "Pump delivering bolus"
+      },
+      "uploader_charging": {
+        "name": "Uploader charging"
+      },
+      "override_active": {
+        "name": "Loop override active"
       }
     }
   }

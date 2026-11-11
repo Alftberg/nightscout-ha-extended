@@ -8,6 +8,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import PERCENTAGE, UnitOfMass, UnitOfTime
 
+from .const import AGE_EVENTS
 from .entity import NightscoutEntity
 
 DESCRIPTIONS = (
@@ -52,19 +53,27 @@ DESCRIPTIONS = (
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
+    *(
+        SensorEntityDescription(
+            key=key,
+            translation_key=key,
+            device_class=SensorDeviceClass.DURATION,
+            native_unit_of_measurement=UnitOfTime.HOURS,
+            suggested_display_precision=1,
+        )
+        for key in AGE_EVENTS
+    ),
+    SensorEntityDescription(key="loop_version", translation_key="loop_version"),
     SensorEntityDescription(
-        key="cage",
-        translation_key="cage",
-        device_class=SensorDeviceClass.DURATION,
-        native_unit_of_measurement=UnitOfTime.HOURS,
-        suggested_display_precision=1,
+        key="pump_timestamp",
+        translation_key="pump_timestamp",
+        device_class=SensorDeviceClass.TIMESTAMP,
     ),
     SensorEntityDescription(
-        key="sage",
-        translation_key="sage",
-        device_class=SensorDeviceClass.DURATION,
-        native_unit_of_measurement=UnitOfTime.HOURS,
-        suggested_display_precision=1,
+        key="glucose_forecast",
+        translation_key="glucose_forecast",
+        device_class=SensorDeviceClass.BLOOD_GLUCOSE_CONCENTRATION,
+        native_unit_of_measurement="mg/dL",
     ),
     SensorEntityDescription(
         key="loop_timestamp",
@@ -82,3 +91,9 @@ class NightscoutSensor(NightscoutEntity, SensorEntity):
     @property
     def native_value(self):
         return self.value
+
+    @property
+    def extra_state_attributes(self):
+        if self.entity_description.key == "glucose_forecast" and self.value is not None:
+            return {"forecast_points": self.coordinator.data["forecast_points"]}
+        return None

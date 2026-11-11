@@ -62,6 +62,21 @@
       },
       "sage": {
         "name": "Glukossensorns ålder (SAGE)"
+      },
+      "iage": {
+        "name": "Tid sedan insulinbyte (IAGE)"
+      },
+      "bage": {
+        "name": "Tid sedan pumpbatteribyte (BAGE)"
+      },
+      "loop_version": {
+        "name": "Loop-version"
+      },
+      "pump_timestamp": {
+        "name": "Tid för pumpstatus"
+      },
+      "glucose_forecast": {
+        "name": "Glukosprognos"
       }
     },
     "binary_sensor": {
@@ -73,6 +88,12 @@
       },
       "pump_bolusing": {
         "name": "Pumpen ger bolus"
+      },
+      "uploader_charging": {
+        "name": "Uppladdaren laddas"
+      },
+      "override_active": {
+        "name": "Loop-override aktiv"
       }
     }
   }

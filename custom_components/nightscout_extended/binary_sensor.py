@@ -6,7 +6,7 @@ from .entity import NightscoutEntity
 
 DESCRIPTIONS = tuple(
     BinarySensorEntityDescription(key=key, translation_key=key)
-    for key in ("loop_ok", "pump_suspended", "pump_bolusing")
+    for key in ("loop_ok", "pump_suspended", "pump_bolusing", "uploader_charging", "override_active")
 )
 
 

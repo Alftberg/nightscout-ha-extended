@@ -50,7 +50,7 @@ def parse(entries, statuses, now):
             if isinstance(entry.get("direction"), str):
                 data["trend"] = entry["direction"]
 
-    for key in ("loop", "pump", "uploader"):
+    for key in ("loop", "pump", "uploader", "override"):
         candidates = []
         for status in statuses:
             section = mapping(status.get(key))
@@ -63,15 +63,26 @@ def parse(entries, statuses, now):
         if not fresh(created, now):
             continue
 
-        if key == "uploader":
+        if key in ("uploader", "override"):
             reported = timestamp(section.get("timestamp")) or created
+            if not fresh(reported, now):
+                continue
+            if key == "override":
+                active = section.get("active")
+                if isinstance(active, bool):
+                    data["override_active"] = active
+                continue
+            charging = section.get("isCharging")
+            if isinstance(charging, bool):
+                data["uploader_charging"] = charging
             battery = number(section.get("battery"))
-            if fresh(reported, now) and battery is not None and 0 <= battery <= 100:
+            if battery is not None and 0 <= battery <= 100:
                 data["uploader_battery"] = battery
             continue
 
         if key == "pump":
             pump_time = timestamp(section.get("clock")) or created
+            data["pump_timestamp"] = pump_time
             if fresh(pump_time, now):
                 model = section.get("model")
                 if isinstance(model, str) and model.strip():
@@ -93,6 +104,13 @@ def parse(entries, statuses, now):
         data["loop_timestamp"] = loop_time
         if not fresh(loop_time, now):
             continue
+        version = section.get("version")
+        if isinstance(version, str) and version.strip():
+            data["loop_version"] = version.strip()
+        points = forecast_points(section.get("predicted"), now)
+        if points:
+            data["glucose_forecast"] = points[-1]["mg_dl"]
+            data["forecast_points"] = points
         for metric in ("iob", "cob"):
             reading = mapping(section.get(metric))
             if fresh(timestamp(reading.get("timestamp")) or loop_time, now):
@@ -102,6 +120,23 @@ def parse(entries, statuses, now):
         elif timestamp(section.get("timestamp")) is not None:
             data["loop_ok"] = True
     return data
+
+
+def forecast_points(predicted, now):
+    """Return timestamped Loop forecast points in mg/dL."""
+    predicted = mapping(predicted)
+    start = timestamp(predicted.get("startDate"))
+    values = predicted.get("values")
+    if not fresh(start, now) or not isinstance(values, list):
+        return []
+
+    points = []
+    for index, value in enumerate(values):
+        glucose = number(value)
+        if glucose is not None and glucose > 0:
+            point_time = start + timedelta(minutes=5 * index)
+            points.append({"timestamp": point_time.isoformat(), "mg_dl": glucose})
+    return points
 
 
 def event_age_hours(records, event_types, now):

@@ -70,7 +70,7 @@ class ParserTest(unittest.TestCase):
             [{"created_at": RECENT, "pump": {"reservoir": -1, "battery": {"percent": 140}}}],
             NOW,
         )
-        self.assertEqual(set(data), {"glucose_timestamp"})
+        self.assertEqual(set(data), {"glucose_timestamp", "pump_timestamp"})
 
     def test_uploader_battery_and_pump_status(self):
         data = parse([], [{
@@ -105,3 +105,37 @@ class ParserTest(unittest.TestCase):
         ]
         self.assertEqual(event_age_hours(records, ("Sensor Start", "Sensor Change"), NOW), 3)
         self.assertIsNone(event_age_hours(records, ("Site Change",), NOW))
+
+    def test_fresh_status_and_forecast(self):
+        data = parse([], [{
+            "created_at": RECENT,
+            "pump": {"clock": RECENT},
+            "uploader": {"isCharging": False},
+            "override": {"active": True},
+            "loop": {
+                "timestamp": RECENT,
+                "version": "1.2.3",
+                "predicted": {"startDate": RECENT, "values": [100, None, 112]},
+            },
+        }], NOW)
+        self.assertEqual(data["pump_timestamp"].isoformat(), RECENT)
+        self.assertIs(data["uploader_charging"], False)
+        self.assertIs(data["override_active"], True)
+        self.assertEqual(data["loop_version"], "1.2.3")
+        self.assertEqual(data["glucose_forecast"], 112)
+        self.assertEqual(data["forecast_points"], [
+            {"timestamp": RECENT, "mg_dl": 100},
+            {"timestamp": (NOW + timedelta(minutes=8)).isoformat(), "mg_dl": 112},
+        ])
+
+    def test_stale_override_and_prediction_are_unknown(self):
+        data = parse([], [{
+            "created_at": RECENT,
+            "override": {"active": True, "timestamp": STALE},
+            "loop": {
+                "timestamp": RECENT,
+                "predicted": {"startDate": STALE, "values": [100, 112]},
+            },
+        }], NOW)
+        self.assertNotIn("override_active", data)
+        self.assertNotIn("glucose_forecast", data)
