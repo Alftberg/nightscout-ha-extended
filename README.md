@@ -2,6 +2,8 @@
 
 Nightscout Extended reads glucose and Loop telemetry from Nightscout API v1 into Home Assistant. It polls once a minute and requires Home Assistant 2026.1.0 or later.
 
+<img width="1480" height="489" alt="image" src="https://github.com/user-attachments/assets/94f25dc9-9981-44b9-bd20-f1e62994482d" />
+
 Please understand that this project:
 
 - Is highly experimental
